@@ -17,9 +17,9 @@ TEXT_COLOR = (255, 255, 255)
 
 
 def create_video(text: str = 'Hello World') -> str:
-    text_size = int(VIDEO_HEIGHT*TEXT_SIZE_RATIO)
+    # text_size = int(VIDEO_HEIGHT*TEXT_SIZE_RATIO)
 
-    font = ImageFont.truetype(f"{FONT}.ttf", text_size)
+    font = ImageFont.load_default()
     left, top, right, bottom = font.getbbox(text)
     text_height = bottom - top
     text_width = right - left
