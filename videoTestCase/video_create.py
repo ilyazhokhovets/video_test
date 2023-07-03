@@ -1,6 +1,8 @@
+import io
+import json
 
 import cv2
-
+import os
 from PIL import Image
 from PIL import ImageFont
 from PIL import ImageDraw
@@ -9,17 +11,33 @@ import numpy as np
 VIDEO_WIDTH = 100
 VIDEO_HEIGHT = 100
 VIDEO_FPS = 24
-TEXT_SIZE_RATIO = 0.4
 VIDEO_DURATION = 3
-# FONT = 'Arial'
+
 BG_COLOR = (0, 0, 0)
 TEXT_COLOR = (255, 255, 255)
 
 
-def create_video(text: str = 'Hello World') -> str:
-    # text_size = int(VIDEO_HEIGHT*TEXT_SIZE_RATIO)
 
-    font = ImageFont.load_default()
+
+
+def get_font():
+    print(os.getcwd())
+    with open('videoTestCase/fonts.json', 'r') as f:
+        settings = json.load(f)
+        font = settings['font']
+        size = settings['size']
+
+    with open(f'videoTestCase/templates/videoTestCase/fonts/{font}.ttf', 'rb') as f:
+        file = f.read()
+    file = io.BytesIO(file)
+    return file, size
+
+
+def create_video(text: str = 'Hello World') -> str:
+    font, size = get_font()
+    text_size = int(VIDEO_HEIGHT*size)
+    # font = ImageFont.FreeTypeFont
+    font = ImageFont.truetype(font, text_size )
     left, top, right, bottom = font.getbbox(text)
     text_height = bottom - top
     text_width = right - left
