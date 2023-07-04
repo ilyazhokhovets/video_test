@@ -10,7 +10,7 @@ import numpy as np
 
 VIDEO_WIDTH = 100
 VIDEO_HEIGHT = 100
-VIDEO_FPS = 24
+VIDEO_FPS = 60
 VIDEO_DURATION = 3
 
 BG_COLOR = (0, 0, 0)
@@ -20,12 +20,12 @@ TEXT_COLOR = (255, 255, 255)
 
 
 
-def get_font():
+def get_font(query_font, query_size):
     print(os.getcwd())
     with open('videoTestCase/fonts.json', 'r') as f:
         settings = json.load(f)
-        font = settings['font']
-        size = settings['size']
+        font = query_font or settings['font']
+        size = query_size or settings['size']
 
     with open(f'videoTestCase/templates/videoTestCase/fonts/{font}.ttf', 'rb') as f:
         file = f.read()
@@ -33,19 +33,21 @@ def get_font():
     return file, size
 
 
-def create_video(text: str = 'Hello World') -> str:
-    font, size = get_font()
+def create_video(text: str, query_font: str, query_size:float) -> str:
+
+    font, size = get_font(query_font, query_size)
     text_size = int(VIDEO_HEIGHT*size)
-    # font = ImageFont.FreeTypeFont
     font = ImageFont.truetype(font, text_size )
+
     left, top, right, bottom = font.getbbox(text)
+    print(text_size, bottom-top)
     text_height = bottom - top
     text_width = right - left
     n_frames = VIDEO_FPS*VIDEO_DURATION
 
-    step_size = int(round((text_width+VIDEO_WIDTH) / n_frames, 0))
+    step_size = (text_width+VIDEO_WIDTH) / n_frames
     video_name = 'test.mp4'
-
+    print(n_frames, text_width, step_size)
     video = cv2.VideoWriter(video_name, cv2.VideoWriter_fourcc(*'mp4v'), VIDEO_FPS, (VIDEO_WIDTH, VIDEO_HEIGHT))
 
     for step in range(n_frames):
@@ -54,7 +56,7 @@ def create_video(text: str = 'Hello World') -> str:
         draw = ImageDraw.Draw(pil_image)
 
         draw.text(text=text,
-                  xy=(VIDEO_WIDTH - step * step_size, (VIDEO_HEIGHT - text_height) // 2),
+                  xy=(int(VIDEO_WIDTH - step * step_size), (VIDEO_HEIGHT - text_height) // 2),
                   font=font,
                   fill=TEXT_COLOR)
 
